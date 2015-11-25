@@ -1,0 +1,4 @@
+package = .OLC
+name = OLC Browse
+description = Browse the OLC textbook structure
+core = 7.x

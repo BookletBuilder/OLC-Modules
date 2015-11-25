@@ -1,0 +1,80 @@
+<?php
+
+function olcmenu_menu() {
+  return array(
+    'olc' => array(
+      'title' => 'Main menu',
+      'menu_name' => 'main-menu',
+      'access arguments' => array('access content'),
+      'page callback' => '_olcmenu_main_page',
+      'type' => MENU_NORMAL_ITEM,
+    ),
+  );
+}
+
+function _olcmenu_main_page() {
+  
+  $content = '';
+
+  // Sections
+  // * Most recent
+  // * By category
+  // * Uncategorized
+  // * By prerequisite
+  // * Without prerequisites
+  // * Textbook chapters
+  
+  // Authors
+  // * [Name]
+  // * ...
+  
+  // Elements
+  // * Avatars
+    
+  // Reports 
+  // * Prerequisites
+  
+  $content .= theme('item_list', array(
+    'title' => 'Chapters', 
+    'items' => array(
+      l('Textbook chapters', 'chapters'),
+      l('All chapters', 'olc/sections/by-category'),
+      l('Unassigned sections', 'olc/sections/uncategorized'),
+    )
+  ));
+  
+  $content .= theme('item_list', array(
+    'title' => 'Prerequisites', 
+    'items' => array(
+      'Prerequisite '
+        . l('list', 'olc/sections/by-prereq')
+        . ' | '
+        . l('graph', 'prereqs')
+      . '',
+      l('Without prerequisites', 'olc/sections/without-prereqs'),
+    )
+  ));
+
+  $content .= theme('item_list', array(
+    'title' => 'Sections', 
+    'items' => array(
+      l('Most recent sections', 'olc/sections/recent'),
+    )
+  ));
+  
+  $content .= theme('item_list', array(
+    'title' => 'Authors', 
+    'items' => array()));
+    $content .= views_embed_view('section_authors'
+  );
+  
+  $content .= theme('item_list', array(
+    'title' => 'Elements', 
+    'items' => array(
+      l('Avatars', 'avatar-manager'),
+    )
+  ));
+  
+  return $content;
+  
+}

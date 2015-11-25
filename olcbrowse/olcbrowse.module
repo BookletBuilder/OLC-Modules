@@ -1,0 +1,13 @@
+<?php
+
+function olcbrowse_menu () {
+  $items = array();
+  $items['browse'] = array(
+    'access arguments' => array('access content'),
+    'title' => 'OLC Lakota Studies Textbook',
+    'page callback' => '_olcbrowse_page',
+    'type' => MENU_NORMAL_ITEM,
+  	'file' => 'olcbrowse.pages.inc',
+  );
+  return $items;
+}

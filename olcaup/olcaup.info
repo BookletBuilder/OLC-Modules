@@ -1,0 +1,5 @@
+core = 7.x
+package = .OLC
+name = OLC Acceptable Use Agreement
+description = Takes visitor to a page that must be accepted before he or she is able to use the website.
+

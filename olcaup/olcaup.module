@@ -1,0 +1,123 @@
+<?php
+
+function olcaup_init() {
+
+  // Check if cookie knows about AUP
+  if (isset($_COOKIE['aup_accept'])) {
+    $_SESSION['olc_aup_accepted'] = $_COOKIE['olc_aup_accepted'];
+  }
+  else {
+    // Check if user has accepted AUP
+    $user = $GLOBALS['user'];
+    if ($user->uid > 0 && isset($user->data['olc_aup_accepted'])) {
+      $_SESSION['olc_aup_accepted'] = $user->data['olc_aup_accepted'];
+    }
+    else {
+      // Not accepted
+    }
+  }
+
+  $is_login_page = arg(0).'/'.arg(1) == 'user/login';
+  $is_registration_page = arg(0).'/'.arg(1) == 'user/register';
+  $is_request_password = arg(0).'/'.arg(1) == 'user/password';
+  if (!$is_login_page && !$is_registration_page && !$is_request_password){
+    if (!isset($_SESSION['olc_aup_accepted']) || !$_SESSION['olc_aup_accepted']){
+      if (arg(0) != 'acceptable-use-agreement') {
+        drupal_goto(
+          'acceptable-use-agreement',
+          array('query'=>array('redirect'=>$_GET['q']))
+        );
+      }
+      else{
+        // Already there
+      }
+    }
+    else{
+      // Accepted already
+    }
+  }
+
+}
+
+function olcaup_menu() {
+  return array(
+    'acceptable-use-agreement' => array(
+      'title' => 'Acceptable Use Agreement',
+      'page callback' => '_olcaup_page',
+      'access callback' => TRUE,
+      'type' => MENU_CALLBACK
+    ),
+  );
+}
+
+function _olcaup_page() {
+  $content = '';
+  $content .= '
+    <p>This website is for learning and practicing the Lakota language. We hope you become a fluent Lakota language speaker.</p>
+    <p>Many of the materials on this website are protected by U.S. Copyright law.</p>
+    <p>In addition, the materials obtained through this website are subject to Oglala Lakota College policies. 
+    By using this website as a service, you agree to abide by Oglala Lakota College&#39;s policies. 
+    The policies can be found here: LINK TO POLICIES GOES HERE</p>
+  ';
+  $content .= drupal_render(drupal_get_form('_olcaup_form'));
+  return $content;
+}
+
+function _olcaup_form() {
+  $form = array();
+  $form['aup_accept'] = array(
+    '#weight' => '1',
+    '#required' => TRUE,
+    '#type' => 'checkbox',
+    '#title' => t('Yes, I agree'),
+    '#description' => t('Mark the checkbox next to "Yes, I agree" to accept the agreement and continue.'),
+   );
+   $form['submit'] = array(
+     '#type' => 'submit',
+     '#value' => t('Accept and continue'),
+     '#weight' => '2',
+   );
+   return $form;
+}
+
+function _olcaup_form_submit($form, &$form_state) {
+ 
+  if (!isset($_SESSION['aup_accept']) || !$_SESSION['aup_accept']) {
+
+    $aup_accepted = $form_state['values']['aup_accept'];
+
+    // Save to user
+    $user = $GLOBALS['user'];
+    if ($user->uid != 0) {
+      user_save($user, array(
+        'data' => array(
+          'olc_aup_accepted' => $aup_accepted,
+        ),
+      ));
+    }
+    else {
+      // Anonymouse visitor; so, won't be able to save with user data
+    }
+
+    // Save to cookie
+    setcookie("olc_aup_accepted", $aup_accepted);
+
+    // Save to session 
+    $_SESSION['olc_aup_accepted'] = $aup_accepted;
+
+    if (!isset($_GET['redirect'])) {
+      $form_state['redirect'] = '<front>';
+    }
+    else{
+      // form will naturally redirect
+      $form_state['redirect'] = $_GET['redirect'];
+    }
+
+  }
+  else {
+    // Already accepted agreement
+  }
+                                     
+}
+
+
